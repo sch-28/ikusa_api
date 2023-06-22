@@ -1,5 +1,6 @@
 import { supabase } from "../util/db";
 import puppeteer, { Browser } from "puppeteer";
+import Logger from "../util/logger";
 
 /* const getBrowser = () =>
 	process.env.NODE_ENV === "development"
@@ -12,6 +13,7 @@ import puppeteer, { Browser } from "puppeteer";
 export async function create_thumbnail(id: string) {
 	let browser: Browser | null = null;
 	try {
+		Logger.info("Creating thumbnail for war " + id);
 		browser = await puppeteer.launch({
 			headless: "new",
 			executablePath: "/usr/bin/google-chrome",
@@ -35,11 +37,11 @@ export async function create_thumbnail(id: string) {
 			upsert: true,
 		});
 		if (error) {
-			console.error(error);
+			Logger.error(error);
 			return new Response(JSON.stringify(error), { status: 500 });
 		}
 	} catch (e) {
-		console.error(e);
+		Logger.error(e);
 		return new Response(JSON.stringify(e), { status: 500 });
 	} finally {
 		if (browser) {
