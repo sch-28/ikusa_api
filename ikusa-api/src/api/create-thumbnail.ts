@@ -1,5 +1,5 @@
-import puppeteer from "puppeteer";
 import { supabase } from "../util/db";
+import puppeteer, { Browser } from "puppeteer";
 
 const getBrowser = () =>
 	process.env.NODE_ENV === "development"
@@ -10,7 +10,7 @@ const getBrowser = () =>
 /* puppeteer.connect({ browserWSEndpoint: `wss://chrome.browserless.io?token=${process.env.CHROME_KEY}` }); */
 
 export async function create_thumbnail(url: string, id: string) {
-	let browser: puppeteer.Browser | null = null;
+	let browser: Browser | null = null;
 	try {
 		browser = await getBrowser();
 

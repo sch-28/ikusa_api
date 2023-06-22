@@ -20,7 +20,7 @@
 		"express": "^4.18.2",
 		"path": "^0.12.7",
 		"prisma": "^4.16.0",
-		"puppeteer": "^10.4.0",
+		"puppeteer": "^20.7.3",
 		"winston": "^3.9.0"
 	},
 	"devDependencies": {
