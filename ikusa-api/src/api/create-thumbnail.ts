@@ -1,18 +1,22 @@
 import { supabase } from "../util/db";
 import puppeteer, { Browser } from "puppeteer";
 
-const getBrowser = () =>
+/* const getBrowser = () =>
 	process.env.NODE_ENV === "development"
 		? // Run the browser locally while in development
 		  puppeteer.launch()
 		: // Connect to browserless so we don't run Chrome on the same hardware in production
-		  puppeteer.launch();
+		  puppeteer.launch(); */
 /* puppeteer.connect({ browserWSEndpoint: `wss://chrome.browserless.io?token=${process.env.CHROME_KEY}` }); */
 
 export async function create_thumbnail(url: string, id: string) {
 	let browser: Browser | null = null;
 	try {
-		browser = await getBrowser();
+		browser = await puppeteer.launch({
+			headless: "new",
+			executablePath: "/usr/bin/google-chrome",
+			args: ["--no-sandbox"],
+		});
 
 		const page = await browser.newPage();
 		await page.setViewport({
