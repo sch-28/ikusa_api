@@ -9,7 +9,7 @@ import puppeteer, { Browser } from "puppeteer";
 		  puppeteer.launch(); */
 /* puppeteer.connect({ browserWSEndpoint: `wss://chrome.browserless.io?token=${process.env.CHROME_KEY}` }); */
 
-export async function create_thumbnail(url: string, id: string) {
+export async function create_thumbnail(id: string) {
 	let browser: Browser | null = null;
 	try {
 		browser = await puppeteer.launch({
@@ -23,7 +23,7 @@ export async function create_thumbnail(url: string, id: string) {
 			width: 1200,
 			height: 628,
 		});
-		await page.goto(url + "?puppeteer", { waitUntil: "networkidle0" });
+		await page.goto("https://ikusa.site/wars/" + id + "?puppeteer", { waitUntil: "networkidle0" });
 		const war_container = await page.$(".mt-16");
 		if (!war_container) return new Response("Unable to load webpage", { status: 500 });
 		const buffer = await war_container.screenshot({ type: "png" });

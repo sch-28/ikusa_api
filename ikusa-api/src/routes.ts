@@ -9,11 +9,11 @@ export type Response = {
 const router = express.Router();
 
 router.post("/thumbnail", async (req, res) => {
-	const { url, id } = req.body;
-	if (!url || !id) {
+	const { id } = req.body;
+	if (!id) {
 		return res.status(400).json({ error: "Missing required parameters" });
 	}
-	const response = await create_thumbnail(url, id);
+	const response = await create_thumbnail(id);
 	return res.status(response.status).json(response.body);
 });
 
