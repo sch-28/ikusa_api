@@ -6,7 +6,8 @@ const getBrowser = () =>
 		? // Run the browser locally while in development
 		  puppeteer.launch()
 		: // Connect to browserless so we don't run Chrome on the same hardware in production
-		  puppeteer.connect({ browserWSEndpoint: `wss://chrome.browserless.io?token=${process.env.CHROME_KEY}` });
+		  puppeteer.launch();
+/* puppeteer.connect({ browserWSEndpoint: `wss://chrome.browserless.io?token=${process.env.CHROME_KEY}` }); */
 
 export async function create_thumbnail(url: string, id: string) {
 	let browser: puppeteer.Browser | null = null;
