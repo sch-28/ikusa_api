@@ -1,0 +1,3 @@
+[submodule "bdo-api"]
+	path = bdo-api
+	url = https://github.com/octoman90/BDO-REST-API
