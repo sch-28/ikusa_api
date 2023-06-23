@@ -1,14 +1,7 @@
 import { supabase } from "../util/db";
 import puppeteer, { Browser } from "puppeteer";
 import Logger from "../util/logger";
-
-/* const getBrowser = () =>
-	process.env.NODE_ENV === "development"
-		? // Run the browser locally while in development
-		  puppeteer.launch()
-		: // Connect to browserless so we don't run Chrome on the same hardware in production
-		  puppeteer.launch(); */
-/* puppeteer.connect({ browserWSEndpoint: `wss://chrome.browserless.io?token=${process.env.CHROME_KEY}` }); */
+import { ResponseObject } from "../routes";
 
 export async function create_thumbnail(id: string) {
 	let browser: Browser | null = null;
@@ -27,7 +20,7 @@ export async function create_thumbnail(id: string) {
 		});
 		await page.goto("https://ikusa.site/wars/" + id + "?puppeteer", { waitUntil: "networkidle0" });
 		const war_container = await page.$(".mt-16");
-		if (!war_container) return new Response("Unable to load webpage", { status: 500 });
+		if (!war_container) return new ResponseObject("Unable to load webpage", 500);
 		const buffer = await war_container.screenshot({ type: "png" });
 		await browser.close();
 		browser = null;
@@ -38,16 +31,16 @@ export async function create_thumbnail(id: string) {
 		});
 		if (error) {
 			Logger.error(error);
-			return new Response(JSON.stringify(error), { status: 500 });
+			return new ResponseObject(JSON.stringify(error), 500);
 		}
 	} catch (e) {
 		Logger.error(e);
-		return new Response(JSON.stringify(e), { status: 500 });
+		return new ResponseObject(JSON.stringify(e), 500);
 	} finally {
 		if (browser) {
 			browser.close();
 		}
 	}
 
-	return new Response(null, { status: 200 });
+	return new ResponseObject(null, 200);
 }
