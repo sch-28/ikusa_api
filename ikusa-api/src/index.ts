@@ -7,11 +7,19 @@ import rateLimit from "express-rate-limit";
 export const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
-app.use(
-	cors({
-		origin: "https://ikusa.site",
-	})
-);
+if (process.env.NODE_ENV === "production") {
+	app.use(
+		cors({
+			origin: "https://ikusa.site",
+		})
+	);
+} else {
+	app.use(
+		cors({
+			origin: "*",
+		})
+	);
+}
 
 // Apply the rate limiting middleware to all requests
 app.use(

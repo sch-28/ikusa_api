@@ -49,9 +49,19 @@ model MigrateStorage {
 }
 
 model Player {
-  id             String @id @unique
-  family_name    String
-  character_name String
-  class          String
-  region         String
+  id               String             @id @unique
+  family_name      String
+  guild            String?
+  region           String
+  characters PlayerCharacters[]
+}
+
+model PlayerCharacters {
+  class     String
+  level     Int?
+  name      String
+  main      Boolean
+  player    Player  @relation(fields: [player_id], references: [id], onDelete: Cascade)
+  player_id String
+  id        String  @id @unique @default(uuid())
 }
