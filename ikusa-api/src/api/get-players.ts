@@ -44,11 +44,10 @@ export async function get_player(name: string, region: "EU" | "NA" | "SA") {
 		if (player_db) {
 			return new ResponseObject(player_db, 200);
 		}
+		const origin = process.env.NODE_ENV === "production" ? "http://bdo-api:8001" : "http://localhost:8001";
 
 		const result: PlayerJson[] = await (
-			await fetch(
-				`http://localhost:8001/v1/adventurer/search?query=${name}&region=${region}&searchType=familyName&page=1`
-			)
+			await fetch(`${origin}/v1/adventurer/search?query=${name}&region=${region}&searchType=familyName&page=1`)
 		).json();
 
 		if (!result || result.length === 0) {
