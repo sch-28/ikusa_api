@@ -1,9 +1,9 @@
 import { ResponseObject } from "../routes";
 import { prisma, supabase } from "../util/db";
-import { FetchQueue, type Error } from "../util/fetch-queue";
+import { FetchQueue, type Error, origin } from "../util/fetch-queue";
 import Logger from "../util/logger";
 
-type PlayerJson = {
+export type PlayerJson = {
 	familyName: string;
 	profileTarget: string;
 	region: "EU" | "NA" | "SA";
@@ -13,7 +13,7 @@ type PlayerJson = {
 	characters: {
 		name: string;
 		class: string;
-		main: boolean;
+		main?: boolean;
 		level?: number;
 	}[];
 };
@@ -25,7 +25,7 @@ type Player = {
 	characters: {
 		name: string;
 		class: string;
-		main: boolean;
+		main?: boolean;
 		level: number | null;
 	}[];
 	guild: string | null;
@@ -45,7 +45,6 @@ export async function get_player(name: string, region: "EU" | "NA" | "SA") {
 		if (player_db) {
 			return new ResponseObject(player_db, 200);
 		}
-		const origin = process.env.NODE_ENV === "production" ? "http://bdo-api:8001" : "http://localhost:8001";
 
 		const result: PlayerJson[] | Error = await FetchQueue.fetch<PlayerJson[]>(
 			`${origin}/v1/adventurer/search?query=${name}&region=${region}&searchType=familyName&page=1`
