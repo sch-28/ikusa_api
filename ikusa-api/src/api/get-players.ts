@@ -1,5 +1,6 @@
 import { ResponseObject } from "../routes";
 import { prisma, supabase } from "../util/db";
+import { FetchQueue, type Error } from "../util/fetch-queue";
 import Logger from "../util/logger";
 
 type PlayerJson = {
@@ -46,11 +47,11 @@ export async function get_player(name: string, region: "EU" | "NA" | "SA") {
 		}
 		const origin = process.env.NODE_ENV === "production" ? "http://bdo-api:8001" : "http://localhost:8001";
 
-		const result: PlayerJson[] = await (
-			await fetch(`${origin}/v1/adventurer/search?query=${name}&region=${region}&searchType=familyName&page=1`)
-		).json();
+		const result: PlayerJson[] | Error = await FetchQueue.fetch<PlayerJson[]>(
+			`${origin}/v1/adventurer/search?query=${name}&region=${region}&searchType=familyName&page=1`
+		);
 
-		if (!result || result.length === 0) {
+		if (!result || "code" in result || result.length === 0) {
 			return new ResponseObject("Player not found", 404);
 		}
 
