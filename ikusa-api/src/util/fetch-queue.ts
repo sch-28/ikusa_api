@@ -3,6 +3,8 @@ export type Error = {
 	code: number;
 };
 
+export const origin = process.env.NODE_ENV === "production" ? "http://bdo-api:8001" : "http://localhost:8001";
+
 export class FetchQueue {
 	private static queue: { url: string; resolve: (value: any) => void }[] = [];
 	private static interval: NodeJS.Timeout | null = null;
