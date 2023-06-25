@@ -32,7 +32,7 @@ export async function get_characters(names: string[], region: "EU" | "NA" | "SA"
 		if (missing_players.length === 0) {
 			return new ResponseObject(players_db, 200);
 		} */
-        const stream = res.writeHead(200, {
+		const stream = res.writeHead(200, {
 			"Content-Type": "text/plain",
 			"Transfer-Encoding": "chunked",
 		});
@@ -44,13 +44,11 @@ export async function get_characters(names: string[], region: "EU" | "NA" | "SA"
 				char_name: char?.name,
 				name: player.family_name,
 				class: char?.class,
-				progress: i+1,
+				progress: i + 1,
 				total: names.length,
 			};
 			res.write(JSON.stringify(p));
 		}
-
-		
 
 		let progress = names.length - missing_players.length;
 		const promises: Promise<PlayerJson[] | Error>[] = [];
@@ -61,8 +59,9 @@ export async function get_characters(names: string[], region: "EU" | "NA" | "SA"
 			promises.push(name_promise);
 			name_promise.then((result) => {
 				progress++;
-				/* stream.write(`${progress}/${names.length}\n`); */
 				if (!result || "code" in result || result.length === 0) {
+					Logger.error(`Error fetching ${char_name}`);
+					if (result && "code" in result) Logger.error(result.message);
 					stream.write(
 						JSON.stringify({
 							char_name: char_name,
@@ -74,7 +73,6 @@ export async function get_characters(names: string[], region: "EU" | "NA" | "SA"
 					);
 				} else {
 					const player: PlayerJson = result[0];
-					console.log(player);
 					prisma.player
 						.upsert({
 							update: {
