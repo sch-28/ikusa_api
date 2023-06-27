@@ -1,5 +1,5 @@
 import { ResponseObject } from "../routes";
-import { prisma, supabase } from "../util/db";
+import { prisma } from "../util/db";
 import { FetchQueue, type Error, origin } from "../util/fetch-queue";
 import Logger from "../util/logger";
 
@@ -66,17 +66,6 @@ export async function get_player(name: string, region: "EU" | "NA" | "SA") {
 			})),
 			guild: result[0].guild?.name ?? null,
 		};
-		// main character is the character with the highest level, if there are multiple characters with the same level, the one with the main tag is chosen
-		/* const main_character = player.characters.reduce((prev, current) => {
-			if (current.level && prev.level && current.level > prev.level) {
-				return current;
-			} else if (current.level === prev.level) {
-				if (current.main) {
-					return current;
-				}
-			}
-			return prev;
-		}, player.characters[0]); */
 
 		prisma.player
 			.create({

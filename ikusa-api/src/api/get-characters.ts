@@ -26,12 +26,6 @@ export async function get_characters(names: string[], region: "EU" | "NA" | "SA"
 		const missing_players = names.filter(
 			(name) => !players_db.some((player) => player.characters.some((c) => c.name === name))
 		);
-
-		/* console.log(missing_players);
-
-		if (missing_players.length === 0) {
-			return new ResponseObject(players_db, 200);
-		} */
 		const stream = res.writeHead(200, {
 			"Content-Type": "text/plain",
 			"Transfer-Encoding": "chunked",
@@ -120,7 +114,7 @@ export async function get_characters(names: string[], region: "EU" | "NA" | "SA"
 			});
 		}
 
-		const results = await Promise.all(promises);
+		await Promise.all(promises);
 		stream.end();
 	} catch (e) {
 		Logger.error("Error fetching player", e);
