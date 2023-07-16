@@ -12,12 +12,15 @@ datasource db {
 }
 
 model User {
-  id            String @id @unique
-  username      String
-  name          String
-  guild         String
-  discriminator String
-  wars          War[]
+  id                  String       @id @unique
+  username            String
+  name                String
+  guild               String
+  discriminator       String
+  wars                War[]
+  bdo_sync            Boolean      @default(true)
+  created_suggestions Suggestion[] @relation("suggestion_creator")
+  liked_suggestions   Suggestion[] @relation("suggestion_likes")
 }
 
 model War {
@@ -49,11 +52,12 @@ model MigrateStorage {
 }
 
 model Player {
-  id               String             @id @unique
-  family_name      String
-  guild            String?
-  region           String
-  characters PlayerCharacters[]
+  id          String             @id @unique
+  family_name String
+  guild       String?
+  region      String
+  characters  PlayerCharacters[]
+  is_fetched  Boolean            @default(false)
 }
 
 model PlayerCharacters {
@@ -61,7 +65,18 @@ model PlayerCharacters {
   level     Int?
   name      String
   main      Boolean?
-  player    Player  @relation(fields: [player_id], references: [id], onDelete: Cascade)
+  player    Player   @relation(fields: [player_id], references: [id], onDelete: Cascade)
   player_id String
-  id        String  @id @unique @default(uuid())
+  id        String   @id @unique @default(uuid())
+}
+
+model Suggestion {
+  id       String   @id @unique @default(uuid())
+  user     User     @relation("suggestion_creator", fields: [userId], references: [id], onDelete: Cascade)
+  userId   String
+  content  String
+  title    String
+  time     DateTime @default(now())
+  status   String   @default("review")
+  liked_by User[]   @relation("suggestion_likes")
 }

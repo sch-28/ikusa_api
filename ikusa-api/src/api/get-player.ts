@@ -42,40 +42,73 @@ export async function get_player(name: string, region: "EU" | "NA" | "SA") {
 				characters: true,
 			},
 		});
-		if (player_db) {
+		if (player_db && player_db.is_fetched) {
 			return new ResponseObject(player_db, 200);
 		}
 
-		const result: PlayerJson[] | Error = await FetchQueue.fetch<PlayerJson[]>(
-			`${origin}/v1/adventurer/search?query=${name}&region=${region}&searchType=familyName&page=1`
+		let player_id: string | null = null;
+
+		if (!player_db) {
+			const result: PlayerJson[] | Error = await FetchQueue.fetch<PlayerJson[]>(
+				`${origin}/v1/adventurer/search?query=${name}&region=${region}&searchType=familyName&page=1`
+			);
+
+			if (!result || "code" in result || result.length === 0 || !result[0].profileTarget) {
+				return new ResponseObject("Player not found", 404);
+			}
+
+			player_id = result[0].profileTarget;
+		} else {
+			player_id = player_db.id;
+		}
+
+		const result: PlayerJson | Error = await FetchQueue.fetch<PlayerJson>(
+			`${origin}/v1/adventurer?profileTarget=${encodeURIComponent(player_id)}&region=${region}`
 		);
 
-		if (!result || "code" in result || result.length === 0) {
+		if (!result || "code" in result) {
 			return new ResponseObject("Player not found", 404);
 		}
 
 		const player: Player = {
-			family_name: result[0].familyName,
-			id: result[0].profileTarget,
-			region: result[0].region,
-			characters: result[0].characters.map((character) => ({
+			family_name: result.familyName,
+			id: result.profileTarget,
+			region: result.region,
+			characters: result.characters.map((character) => ({
 				name: character.name,
 				class: character.class,
 				main: character.main,
 				level: character.level ?? null,
 			})),
-			guild: result[0].guild?.name ?? null,
+			guild: result.guild?.name ?? null,
 		};
 
 		prisma.player
-			.create({
-				data: {
+			.upsert({
+				create: {
 					family_name: player.family_name,
 					id: player.id,
 					region: player.region,
 					guild: player.guild,
+					is_fetched: true,
 					characters: {
-						create: player.characters,
+						createMany: {
+							data: player.characters,
+							skipDuplicates: true,
+						},
+					},
+				},
+				where: {
+					id: player.id,
+				},
+				update: {
+					guild: player.guild,
+					is_fetched: true,
+					characters: {
+						createMany: {
+							data: player.characters,
+							skipDuplicates: true,
+						},
 					},
 				},
 			})
