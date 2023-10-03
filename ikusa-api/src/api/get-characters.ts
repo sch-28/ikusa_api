@@ -54,7 +54,7 @@ export async function get_characters(names: string[], region: "EU" | "NA" | "SA"
 			name_promise.then((result) => {
 				progress++;
 				if (!result || "code" in result || result.length === 0) {
-					Logger.error(`Error fetching ${char_name}`);
+					Logger.error(`Error fetching ${char_name}, ${(result as Error | undefined)?.message}`);
 					if (result && "code" in result) Logger.error(result.message);
 					stream.write(
 						JSON.stringify({

@@ -1,3 +1,5 @@
+import Logger from "./logger";
+
 export type Error = {
 	message: string;
 	code: number;
@@ -30,10 +32,10 @@ export class FetchQueue {
 			this.interval = setInterval(async () => {
 				if (this.queue.length > 0) {
 					const request = this.queue.shift()!;
-					const result = await fetch(request.url).catch((e) =>
-						request.resolve({ message: e.message, code: 500 })
-					);
-
+					const result = await fetch(request.url).catch((e) => {
+						Logger.error(e);
+						request.resolve({ message: e.message, code: 500 });
+					});
 					result && request.resolve(await result.json().catch((e) => ({ message: e.message, code: 500 })));
 				}
 
